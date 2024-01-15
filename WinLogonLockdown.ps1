@@ -833,12 +833,22 @@ if (!$CreatedGroup) {
 # Prompt the user if we should add users to the group
 $AddUsers = Read-Host "Should we add users to the '$GroupName' group? (Y/N)"
 
+# Check if the device is likely to be a Intune managed device
+Write-Output "Checking if the device is likely to be a Intune managed device"
+$IsIntuneManaged = Test-Path 'HKLM: \SYSTEM\CurrentControlSet\Control\CloudDomainJoin\JoinInfo'
+
 # If we should add users to the group, prompt for the users
 if ($AddUsers -eq 'Y') {
     $UsersToAdd = Read-Host "Enter the users to add to the '$GroupName' group (comma separated without spaces)"
     # Add the users to the group
     Write-Output "Adding users to the '$GroupName' group"
-    Add-LocalGroupMember -Name $GroupName -Member $UsersToAdd.Split(',')
+    if ($IsIntuneManaged) {
+        foreach ($user in $UsersToAdd.Split(',')) {
+            net localgroup "$GroupName" /add "AzureAD\$user" | Out-Null
+        }
+    } else {
+        Add-LocalGroupMember -Name $GroupName -Member $UsersToAdd.Split(',')
+    }
 }
 
 # Script is complete
