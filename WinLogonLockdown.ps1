@@ -835,7 +835,7 @@ $AddUsers = Read-Host "Should we add users to the '$GroupName' group? (Y/N)"
 
 # Check if the device is likely to be a Intune managed device
 Write-Output "Checking if the device is likely to be a Intune managed device"
-$IsIntuneManaged = Test-Path 'HKLM: \SYSTEM\CurrentControlSet\Control\CloudDomainJoin\JoinInfo'
+$IsIntuneManaged = Test-Path 'HKLM:\SYSTEM\CurrentControlSet\Control\CloudDomainJoin\JoinInfo'
 
 # If we should add users to the group, prompt for the users
 if ($AddUsers -eq 'Y') {
